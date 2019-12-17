@@ -6,25 +6,35 @@ using UnityEngine;
 /// Manages cells in the scene.
 /// </summary>
 public class CellManager : MonoBehaviour {
+    public GameObject cells;
+    public bool realtimeUpdate = true;
+
     private CellSettings cellSettings;
     private NoiseSettings noiseSettings;
-    private Noise noise;
-
-    public GameObject cells;
+    private NoiseFilter noise;
+    private Vector3 previousPosition;
 
     /// <summary>
-    /// Called whenever the script is loaded into the editor or values are changed.
+    /// Initialization when the script is loaded.
     /// </summary>
-    private void OnValidate() {
-        Initialize();
+    private void Start() {
+        GetComponents();
+        noise = new NoiseFilter(noiseSettings);
+        previousPosition = this.transform.position;
     }
 
     /// <summary>
-    /// Initializes the properties.
+    /// Called once per frame.
     /// </summary>
-    private void Initialize() {
-        GetComponents();
-        noise = new Noise(noiseSettings);
+    private void Update() {
+        // Check if position of cube has changed, only if realtimeUpdate is enabled.
+        if (realtimeUpdate) {
+            if (this.transform.position != previousPosition) {
+                // Clear and generate a new cell at the position.
+                ClearCells();
+                GenerateCell();
+            }
+        }
     }
 
     /// <summary>
@@ -51,6 +61,9 @@ public class CellManager : MonoBehaviour {
         cellObject.transform.parent = cells.transform;
     }
 
+    /// <summary>
+    /// Get rid of all of the cells that are children of the "cells" object.
+    /// </summary>
     public void ClearCells() {
         List<Transform> childList = new List<Transform>();
 
@@ -61,7 +74,7 @@ public class CellManager : MonoBehaviour {
 
         // Destroy everything in the list.
         foreach (Transform child in childList) {
-            GameObject.DestroyImmediate(child.gameObject);
+            GameObject.Destroy(child.gameObject);
         }
     }
 }

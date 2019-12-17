@@ -35,7 +35,7 @@ public class CellMesh {
                 for (int zIndex = 0; zIndex < densities.GetLength(2) - 1; zIndex++) {
                     // Create a marching cube for this position.
                     Vector3Int cubeIndex = new Vector3Int(xIndex, yIndex, zIndex);
-                    MarchingCube cube = new MarchingCube(cubeIndex, points, densities);
+                    MarchingCube cube = new MarchingCube(settings, cubeIndex, points, densities);
 
                     // Determine which triangles to draw for this cube.
                     int cubeCase = ConcatenateIntoByte(GetActiveDensityBitArray(cube.densities));

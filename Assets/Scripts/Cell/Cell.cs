@@ -8,7 +8,7 @@ using UnityEngine;
 public class Cell {
     private Vector3 position;
     private CellSettings settings;
-    private Noise noise;
+    private NoiseFilter noise;
 
     private Vector3[,,] worldPoints;
     private Vector3[,,] localPoints;
@@ -19,7 +19,7 @@ public class Cell {
     /// </summary>
     /// <param name="position">The world position of the cell (left, bottom, back).</param>
     /// <param name="settings">Settings for the cell that should be applied to all cells.</param>
-    public Cell(Vector3 position, CellSettings settings, Noise noise) {
+    public Cell(Vector3 position, CellSettings settings, NoiseFilter noise) {
         this.position = position;
         this.settings = settings;
         this.noise = noise;

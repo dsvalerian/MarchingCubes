@@ -17,19 +17,7 @@ public class CellManagerEditor : Editor {
         if (GUILayout.Button("Generate Cell")) {
             cellManager.GenerateCell();
         }
-/*
-        if (GUILayout.Button("Generate Cube of Cells")) {
-            // Loop through x y z
-            for (int x = 0; x < 4; x++) {
-                for (int y = 0; y < 4; y++) {
-                    for (int z = 0; z < 4; z++) {
-                        cellManager.transform.position = new Vector3(256 * x, 256 * y, 256 * z);
-                        cellManager.GenerateCell();
-                    }
-                }
-            }
-        }
-*/
+
         if (GUILayout.Button("Clear Cells")) {
             cellManager.ClearCells();
         }

@@ -10,6 +10,7 @@ public class MarchingCube {
     public float[] densities;
 
     private Vector3Int indexInCell;
+    private CellSettings settings;
 
     /// <summary>
     /// Constructor.
@@ -17,8 +18,10 @@ public class MarchingCube {
     /// <param name="indexInCell">The position of the cube in terms of cell arrays</param>
     /// <param name="cellPoints">Local points/positions of the densities</param>
     /// <param name="cellDensities">The calculated densities for each point in the cell</param>
-    public MarchingCube(Vector3Int indexInCell, Vector3[,,] cellPoints, float[,,] cellDensities) {
+    public MarchingCube(CellSettings settings, Vector3Int indexInCell, Vector3[,,] cellPoints, 
+            float[,,] cellDensities) {
         this.indexInCell = indexInCell;
+        this.settings = settings;
         points = CalculateCubePoints(cellPoints);
         densities = CalculateCubeDensities(cellDensities);
     }
@@ -30,11 +33,28 @@ public class MarchingCube {
     /// <returns>The local position of the midpoint</returns>
     public Vector3 GetEdgeMidpoint(int edgeNumber) {
         Vector3[] edgePoints = GetEdgePoints(edgeNumber);
+        float[] edgeDensities = GetEdgeDensities(edgeNumber);
 
-        if (edgePoints == null) {
-            Debug.LogError("edgepoints are null");
+        if (edgeDensities[0] < edgeDensities[1]) {
+            float zeroDistance = (settings.surfaceLevel - edgeDensities[0]) / 
+                (edgeDensities[0] - edgeDensities[1]);
+            zeroDistance /= 100;
+
+            return Vector3.Lerp(edgePoints[0], edgePoints[1], zeroDistance);
         }
-        return (edgePoints[0] + edgePoints[1]) / 2;
+        else {
+            float zeroDistance = (settings.surfaceLevel - edgeDensities[1]) / 
+                (edgeDensities[1] - edgeDensities[0]);
+            zeroDistance /= 100;
+
+            return Vector3.Lerp(edgePoints[1], edgePoints[0], zeroDistance);
+        }
+        
+        
+        //Debug.Log(zeroDistance);
+
+        //return (edgePoints[0] + edgePoints[1]) / 2;
+        
     }
 
     /// <summary>
@@ -106,6 +126,43 @@ public class MarchingCube {
                 return new Vector3[] {points[2], points[6]};
             case 11:
                 return new Vector3[] {points[3], points[7]};
+            default:
+                Debug.LogError(edgeNumber);
+                return null;
+        }
+    }
+
+    /// <summary>
+    /// Get the densities of the endpoints of an edge.
+    /// </summary>
+    /// <param name="edgeNumber">The number of the edge in the cube to use</param>
+    /// <returns>Array of 2 densities</returns>
+    private float[] GetEdgeDensities(int edgeNumber) {
+        switch(edgeNumber) {
+            case 0:
+                return new float[] {densities[0], densities[1]};
+            case 1:
+                return new float[] {densities[1], densities[2]};
+            case 2:
+                return new float[] {densities[2], densities[3]};
+            case 3:
+                return new float[] {densities[3], densities[0]};
+            case 4:
+                return new float[] {densities[4], densities[5]};
+            case 5:
+                return new float[] {densities[5], densities[6]};
+            case 6:
+                return new float[] {densities[6], densities[7]};
+            case 7:
+                return new float[] {densities[7], densities[4]};
+            case 8:
+                return new float[] {densities[0], densities[4]};
+            case 9:
+                return new float[] {densities[1], densities[5]};
+            case 10:
+                return new float[] {densities[2], densities[6]};
+            case 11:
+                return new float[] {densities[3], densities[7]};
             default:
                 Debug.LogError(edgeNumber);
                 return null;
