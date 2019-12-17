@@ -1,7 +1,7 @@
 # MarchingCubes
-An implementation of procedurally-generated terrain using the marching cubes method for 3D mesh generation.
+Author: Dmitri Salov
 
-Written by Dmitri Salov
+An implementation of procedurally-generated terrain using the marching cubes method for 3D mesh generation.
 
 ## Overview
 Marching cubes is a method used for generating 3D meshes using volumetric data. This volumetric data is represented by a collection of equidistant points in 3D space and a density value associated with each point. We then form "cubes" using a set of 8 points as the vertices of a cube and "march" through a section of 3D space, building a mesh using the densities of the cube vertices.
