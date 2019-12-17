@@ -24,11 +24,12 @@ public class Noise {
     /// <param name="z">z coordinate</param>
     /// <returns></returns>
     public float Evaluate(float x, float y, float z) {
-        //x *= .01f;
-        //y *= .01f;
-        //z *= .01f;
+        x *= .01f;
+        y *= .01f;
+        z *= .01f;
 
         return Perlin3D(x, y, z);
+       // return -y;
     }
 
     /// <summary>

@@ -10,7 +10,8 @@ public class Cell {
     private CellSettings settings;
     private Noise noise;
 
-    private Vector3[,,] points;
+    private Vector3[,,] worldPoints;
+    private Vector3[,,] localPoints;
     private float[,,] densities;
 
     /// <summary>
@@ -22,8 +23,9 @@ public class Cell {
         this.position = position;
         this.settings = settings;
         this.noise = noise;
-        points = new Vector3[settings.resolution, settings.resolution, settings.resolution];
-        densities = new float[settings.resolution, settings.resolution, settings.resolution];
+        worldPoints = new Vector3[settings.resolution + 1, settings.resolution + 1, settings.resolution + 1];
+        localPoints = new Vector3[settings.resolution + 1, settings.resolution + 1, settings.resolution + 1];
+        densities = new float[settings.resolution + 1, settings.resolution + 1, settings.resolution + 1];
     }
 
     /// <summary>
@@ -33,14 +35,16 @@ public class Cell {
         float stepSize = settings.size / settings.resolution;
 
         // Loop through all points to generate from the position.
-        for (int x = 0; x < settings.resolution; x++) {
-            for (int y = 0; y < settings.resolution; y++) {
-                for (int z = 0; z < settings.resolution; z++) {
+        for (int x = 0; x < settings.resolution + 1; x++) {
+            for (int y = 0; y < settings.resolution + 1; y++) {
+                for (int z = 0; z < settings.resolution + 1; z++) {
+                    Vector3 localPosition = new Vector3(x * stepSize, y * stepSize, z * stepSize);
                     Vector3 worldPosition = new Vector3(x * stepSize + position.x,
                                                         y * stepSize + position.y,
                                                         z * stepSize + position.z);
-                    //worldPosition = position;
-                    points[x, y, z] = worldPosition;
+                    
+                    localPoints[x, y, z] = localPosition;
+                    worldPoints[x, y, z] = worldPosition;
 
                     // Calculate noise/density at this point.
                     float density = noise.Evaluate(worldPosition);
@@ -50,20 +54,25 @@ public class Cell {
         }
     }
 
+    /// <summary>
+    /// Generates a game object with the appropriate mesh for this cell.
+    /// </summary>
+    /// <returns>A GameObject positioned at 0, 0, 0</returns>
     public GameObject GenerateObject() {
-        GameObject cellParent = new GameObject("cell");
-        cellParent.transform.position = Vector3.zero;
+        // Create the overall cell object
+        GameObject cellObject = new GameObject("cell");
+        cellObject.transform.position = Vector3.zero;
 
-        GameObject cellObject = new GameObject("model");
-        float offset = settings.size / 2;
-        cellObject.transform.parent = cellParent.transform;
-        //cellObject.transform.localPosition = new Vector3(offset, offset, offset);
+        // Create the object holding the model and set it as a child of the cell object
+        GameObject modelObject = new GameObject("model");
+        modelObject.transform.parent = cellObject.transform;
 
-        MeshRenderer renderer = (MeshRenderer)cellObject.AddComponent<MeshRenderer>();
-        MeshFilter filter = (MeshFilter)cellObject.AddComponent<MeshFilter>();
-        filter.sharedMesh = new CellMesh(densities, points).Generate();
+        // Set up renderer/filter and generate the actual cell mesh and apply it to the model object
+        MeshRenderer renderer = (MeshRenderer)modelObject.AddComponent<MeshRenderer>();
+        MeshFilter filter = (MeshFilter)modelObject.AddComponent<MeshFilter>();
+        filter.sharedMesh = new CellMesh(settings, densities, localPoints).Generate();
         renderer.sharedMaterial = new Material(Shader.Find("Standard"));
 
-        return cellParent;
+        return cellObject;
     }
 }

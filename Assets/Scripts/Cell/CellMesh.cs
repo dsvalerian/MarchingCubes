@@ -6,14 +6,26 @@ using UnityEngine;
 /// Generates a mesh from volumetric data using marching cubes.
 /// </summary>
 public class CellMesh {
+    private CellSettings settings;
     private float[,,] densities;
     private Vector3[,,] points;
 
-    public CellMesh(float[,,] densities, Vector3[,,] points) {
+    /// <summary>
+    /// Constructor.
+    /// </summary>
+    /// <param name="settings">The settings used for the Cell</param>
+    /// <param name="densities">The calculated densities from the cell</param>
+    /// <param name="points">The local points/positions of the densities</param>
+    public CellMesh(CellSettings settings, float[,,] densities, Vector3[,,] points) {
+        this.settings = settings;
         this.densities = densities;
         this.points = points;
     }
 
+    /// <summary>
+    /// Generate a 3D mesh for the densities using a marching cubes algorithm.
+    /// </summary>
+    /// <returns>A Mesh object</returns>
     public Mesh Generate() {
         List<Vector3> vertices = new List<Vector3>();
 
@@ -114,7 +126,7 @@ public class CellMesh {
     /// <param name="densityValue">The density of the voxel point</param>
     /// <returns>1 if the density is enough to activate, 0 otherwise</returns>
     private int IsActive(float densityValue) {
-        if (densityValue < 0.5) {
+        if (densityValue > settings.surfaceLevel) {
             return 1;
         }
 

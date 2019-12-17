@@ -10,15 +10,13 @@ public class CellManager : MonoBehaviour {
     private NoiseSettings noiseSettings;
     private Noise noise;
 
-    public Vector3 cellPosition;
+    public GameObject cells;
 
     /// <summary>
     /// Called whenever the script is loaded into the editor or values are changed.
     /// </summary>
     private void OnValidate() {
         Initialize();
-        ClearCells();
-        GenerateCellAt(cellPosition);
     }
 
     /// <summary>
@@ -41,21 +39,29 @@ public class CellManager : MonoBehaviour {
         }
     }
 
-    public void ClearCells() {
-        foreach (Transform child in this.transform) {
-            child.transform.position = new Vector3(10000, 10000, 10000);
-        }
-    }
-
     /// <summary>
     /// Creates a cell and generates densities for it at a specific location.
     /// </summary>
     /// <param name="position"></param>
-    public void GenerateCellAt(Vector3 position) {
-        Cell cell = new Cell(position, cellSettings, noise);
+    public void GenerateCell() {
+        Cell cell = new Cell(this.transform.position, cellSettings, noise);
         cell.GenerateDensities();
         GameObject cellObject = cell.GenerateObject();
-        cellObject.transform.position = position;
-        cellObject.transform.parent = this.transform;
+        cellObject.transform.position = this.transform.position;
+        cellObject.transform.parent = cells.transform;
+    }
+
+    public void ClearCells() {
+        List<Transform> childList = new List<Transform>();
+
+        // Add all children to be destroyed to the list.
+        foreach (Transform child in cells.transform) {
+            childList.Add(child);
+        }
+
+        // Destroy everything in the list.
+        foreach (Transform child in childList) {
+            GameObject.DestroyImmediate(child.gameObject);
+        }
     }
 }

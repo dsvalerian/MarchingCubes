@@ -8,6 +8,8 @@ using UnityEngine;
 public class CellSettings : MonoBehaviour {
     [Range(1f, 512f)]
     public float size = 32;
-    [Range(1, 16)]
+    [Range(1, 32)]
     public int resolution = 8;
+    [Range(0f, 1f)]
+    public float surfaceLevel = 0.5f;
 }
